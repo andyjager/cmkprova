@@ -27,11 +27,11 @@ while($tasks=$task->fetchArray())
 	$job=$dbj->query("select * from result_table where task_id=$tasks[task_id] and job_action=1 order by result_id desc limit 1");
 	$jobs=$job->fetchArray();
 
-  if(is_null($jobs)){
+  if (is_null($jobs)){
     continue;
   }
 
-  if(is_bool($jobs)){
+  if (is_bool($jobs)){
      continue;
   }
   

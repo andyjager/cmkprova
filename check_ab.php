@@ -27,63 +27,59 @@ while($tasks=$task->fetchArray())
 	$job=$dbj->query("select * from result_table where task_id=$tasks[task_id] and job_action=1 order by result_id desc limit 1");
 	$jobs=$job->fetchArray();
 
-  if (is_null($jobs)){
-    continue;
-  }
-
-  if (is_bool($jobs)){
-     continue;
-  }
+  if (!is_null($jobs)){
+  	if (!is_bool($jobs)){
   
-	$start=date("d.m.Y H:m", $jobs['time_start']);
-	
-	// exclude some defined jobs
-	if (!empty($excludes))
-	{
-		foreach ($excludes as $exclude)
+		$start=date("d.m.Y H:m", $jobs['time_start']);
+		
+		// exclude some defined jobs
+		if (!empty($excludes))
 		{
-			if (preg_match("$exclude", $jobs['task_name']))
+			foreach ($excludes as $exclude)
 			{
-				continue 2;
-			}
-    		}
-	}
+				if (preg_match("$exclude", $jobs['task_name']))
+				{
+					continue 0;
+				}
+	    		}
+		}
+		
+		// check if job started < runtime
+		if (($tsnow-$runtime) > $jobs['time_start'] && $runtimecheck)
+		{
+			$out.="ERROR: $jobs[task_name] was not running inside runtime window (Now: $now, Last Start: $start, Not older as:. $runtimehuman ) -- ";
+			$error=2;
+	                $exit_error=2;
+		}
 	
-	// check if job started < runtime
-	if (($tsnow-$runtime) > $jobs['time_start'] && $runtimecheck)
-	{
-		$out.="ERROR: $jobs[task_name] was not running inside runtime window (Now: $now, Last Start: $start, Not older as:. $runtimehuman ) -- ";
-		$error=2;
-                $exit_error=2;
+		// check if job is running
+		if ($jobs['status'] == 1)
+		{
+			$out.="OK: $jobs[task_name] is running -- ";
+			continue 0;
+		}
+	
+		//warnings
+		if ($jobs['status'] == 3)
+		{
+			$out.="WARN: $jobs[task_name] had Warnings -- ";
+			$error=1;
+	                $exit_error=1;
+		}
+	
+		// errors
+		if ($jobs['error_count'] > 0)
+	        {
+	                $out.="ERROR: $jobs[task_name] had an Error -- ";
+	                $error=2;
+	                $exit_error=2;
+	        }
+		if ($error == 0)
+		{
+			$out.="OK: $jobs[task_name] ran successfully -- ";
+		}
 	}
-
-	// check if job is running
-	if ($jobs['status'] == 1)
-	{
-		$out.="OK: $jobs[task_name] is running -- ";
-		continue;
-	}
-
-	//warnings
-	if ($jobs['status'] == 3)
-	{
-		$out.="WARN: $jobs[task_name] had Warnings -- ";
-		$error=1;
-                $exit_error=1;
-	}
-
-	// errors
-	if ($jobs['error_count'] > 0)
-        {
-                $out.="ERROR: $jobs[task_name] had an Error -- ";
-                $error=2;
-                $exit_error=2;
-        }
-	if ($error == 0)
-	{
-		$out.="OK: $jobs[task_name] ran successfully -- ";
-	}
-
+  }
 }
 
 echo $out;

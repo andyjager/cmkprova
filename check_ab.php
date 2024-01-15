@@ -47,6 +47,9 @@ while($tasks=$task->fetchArray())
 			$error=2;
 	                $exit_error=2;
 		}
+
+		echo $jobs;
+		exit(0);
 	
 		// check if job is running
 		if ($jobs['status'] == 1)

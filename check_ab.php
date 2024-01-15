@@ -1,17 +1,13 @@
 #!/bin/php
 <?php
 
-// https://github.com/righter83/checkmk-synology-activebackup
-// v1.3
-
-// open DBs
 $dbt=new SQLite3("/volume1/@ActiveBackup/config.db");
 $dbj=new SQLite3("/volume1/@ActiveBackup/activity.db");
 
 // configs
 $runtime=86500;
 $runtimehuman=gmdate("H:i:s", $runtime);
-$runtimecheck=True;
+$runtimecheck=False;
 $tsnow=Time();
 $now=date("d.m.Y H:m", $tsnow);
 $exit_error=0;
@@ -76,11 +72,11 @@ while($tasks=$task->fetchArray())
 	        }
 		if ($error == 0)
 		{
-			$out.="OK: $jobs[task_name] ran successfully -- ";
+			//$out.="OK: $jobs[task_name] ran successfully -- ";
 		}
 	}
   }
 }
 
 echo $out;
-exit(0);
+exit($exit_error);

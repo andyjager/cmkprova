@@ -39,7 +39,7 @@ while($tasks=$task->fetchArray())
 			{
 				if (preg_match("$exclude", $jobs['task_name']))
 				{
-					continue 0;
+					continue;
 				}
 	    		}
 		}
@@ -56,7 +56,7 @@ while($tasks=$task->fetchArray())
 		if ($jobs['status'] == 1)
 		{
 			$out.="OK: $jobs[task_name] is running -- ";
-			continue 0;
+			continue;
 		}
 	
 		//warnings
@@ -83,4 +83,4 @@ while($tasks=$task->fetchArray())
 }
 
 echo $out;
-exit($exit_error);
+exit(0);

@@ -1,4 +1,4 @@
 
 print("prova")
 
-return 0
+exit(0)
